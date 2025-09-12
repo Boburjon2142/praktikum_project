@@ -1,0 +1,24 @@
+{% extends 'news/base.html' %}
+{% load static %}
+
+
+{% block title %} Sport xabarlari {% endblock title %}
+
+
+
+{% block content %}
+<div style="margin:340px 30px 10px 30px;">
+
+    {% for news in texnologiya_yangiliklari %}
+            <div class="container">
+            <a href="{{ news.get_absolute_url }}">
+            <div class="row" style="display: flex; margin-bottom: 20px;">
+                <img src="{{ news.image.url }}" alt="{{ news.title }}" style="width:300px; height:200px; border-radius:8px;">
+                <h2><div style="display:inline-block; line-height: 1.8; text-align: justify; margin-left: 20px; margin-right: 80px; ">{{ news.title }}</div></h2>
+            </div>
+            </a>
+        </div>
+    {% endfor %}
+
+</div>
+{% endblock content %}

@@ -1,0 +1,25 @@
+{% extends 'news/base.html' %}
+{% load static %}
+
+
+
+    {% block title %}{{ news.title }}{% endblock %}
+
+{% block content %}
+
+
+<h1>
+  {{ news.title }}
+</h1>
+  <p>
+    Published date: {{ news.publish_time }}
+  </p>
+<div style="display: flex; margin: 20px 0;">
+  <img src="{{ news.image.url }}" alt="" style="width:500px">
+  <p style="text-align: justify; margin-left: 20px; font-size: 18px;">
+    {{ news.body }}
+  </p>
+</div>
+
+
+{% endblock content %}
