@@ -1,4 +1,4 @@
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render, get_object_or_404
 from django.urls import reverse_lazy
 from django.views.generic import TemplateView, ListView, UpdateView, CreateView, DeleteView
@@ -9,7 +9,7 @@ from .forms import CommentForm, ContactForm
 from django.contrib.auth.decorators import login_required, user_passes_test
 from newsproject.custom_permissions import OnlyLoggedSuperUser
 from django.contrib.auth.models import User
-from hitcount.models import HitCount, HitCountMixin # type: ignore
+from hitcount.models import HitCount  # type: ignore
 from hitcount.views import HitCountMixin  # type: ignore
 
 
@@ -38,21 +38,30 @@ def news_detail(request, news):
     comment_count = comments.count()
     new_comment = None
     if request.method == "POST":
+        # Process comment submission only for authenticated users
+        if not request.user.is_authenticated:
+            return HttpResponseRedirect(news.get_absolute_url())
         comment_form = CommentForm(data=request.POST)
         if comment_form.is_valid():
             new_comment = comment_form.save(commit=False)
             new_comment.news = news
             new_comment.user = request.user
-            comment_form = CommentForm()
             new_comment.save()
+            # Redirect to avoid duplicate submissions (PRG pattern)
+            return HttpResponseRedirect(news.get_absolute_url())
+        else:
+            # keep the form with errors
+            pass
+        comment_form = comment_form
     else:
         comment_form = CommentForm()
-        context = {
-        "news":news,
-        "comments":comments,
-        "comment_count":comment_count,
-        "new_comment":new_comment,
-        'comment_form':comment_form
+
+    context = {
+        "news": news,
+        "comments": comments,
+        "comment_count": comment_count,
+        "new_comment": new_comment,
+        "comment_form": comment_form,
     }
 
     return render(request, 'news/news_detail.html', context)
@@ -80,12 +89,12 @@ class HomePageView(ListView):
         self, *, object_list = ..., **kwargs
     ):
         context = super().get_context_data(**kwargs)
-        context['categories'] = Category.objects.all()
+        # categories and latest_news come from context processor
         context['news_list'] = News.published.all().order_by('-publish_time')[:5]
-        context['mahalliy_xabarlar'] = News.published.all().filter(category__name='Mahalliy').order_by("-publish_time")[:5]
-        context['xorij_xabarlari'] = News.published.all().filter(category__name='Xorij').order_by("-publish_time")[:5]
-        context['sport_xabarlari'] = News.published.all().filter(category__name='Sport').order_by("-publish_time")[:5]
-        context['texnologiya_xabarlari'] = News.published.all().filter(category__name='Texnologiya').order_by("-publish_time")[:5]
+        context['mahalliy_xabarlar'] = News.published.filter(category__name='Mahalliy').order_by("-publish_time")[:5]
+        context['xorij_xabarlari'] = News.published.filter(category__name='Xorij').order_by("-publish_time")[:5]
+        context['sport_xabarlari'] = News.published.filter(category__name='Sport').order_by("-publish_time")[:5]
+        context['texnologiya_xabarlari'] = News.published.filter(category__name='Texnologiya').order_by("-publish_time")[:5]
         return context
 
 
@@ -168,6 +177,8 @@ class NewsUpdateView(OnlyLoggedSuperUser, UpdateView):
     model = News
     fields = ('title', 'body', 'image', 'category', 'status', )
     template_name = 'crud/news_edit.html'
+    slug_field = 'slug'
+    slug_url_kwarg = 'slug'
     
     
 # class NewsCreateView(CreateView):
@@ -179,6 +190,8 @@ class NewsDeleteView(OnlyLoggedSuperUser, DeleteView):
     model = News
     template_name = 'crud/news_delete.html'
     success_url = reverse_lazy('home_page')
+    slug_field = 'slug'
+    slug_url_kwarg = 'slug'
     
 class NewsCreateView(OnlyLoggedSuperUser, CreateView):
     model = News
@@ -202,7 +215,9 @@ class SearchResultList(ListView):
     context_object_name = 'barcha_yangiliklar'
 
     def get_queryset(self):
-        query = self.request.GET.get('q')
-        return News.objects.filter(
+        query = (self.request.GET.get('q') or '').strip()
+        if not query:
+            return News.published.none()
+        return News.published.filter(
             Q(title__icontains=query) | Q(body__icontains=query)
-                                   )
+        )

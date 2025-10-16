@@ -1,6 +1,21 @@
 from django.urls import path
-from .views import admin_page_view, news_list, news_detail, homePageView, ContactPageView,aboutPageView,custom_404, HomePageView, \
-    LocalNewsView, ForeignNewsView, TechnologyNewsView, SportNewsView, NewsUpdateView, NewsDeleteView, NewsCreateView, admin_page_view, SearchResultList
+from .views import (
+    admin_page_view,
+    news_list,
+    news_detail,
+    ContactPageView,
+    aboutPageView,
+    custom_404,
+    HomePageView,
+    LocalNewsView,
+    ForeignNewsView,
+    TechnologyNewsView,
+    SportNewsView,
+    NewsUpdateView,
+    NewsDeleteView,
+    NewsCreateView,
+    SearchResultList,
+)
 
 
 

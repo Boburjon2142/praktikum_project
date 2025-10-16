@@ -12,7 +12,7 @@
   {{ news.title }}
 </h1>
   <p>
-    Published date: {{ news.publish_time }} | <i class="fa fa-eye" aria-hidden="true"></i> {% get_hit_count for news %} | Izohlar soni: {{ comment__count }}
+    Published date: {{ news.publish_time }} | <i class="fa fa-eye" aria-hidden="true"></i> {% get_hit_count for news %} | Izohlar soni: {{ comment_count }}
   </p>
 <div style="display: flex; margin: 20px 0;">
   <img src="{{ news.image.url }}" alt="" style="width:500px">
@@ -20,7 +20,7 @@
     {{ news.body }}
   </p>
 </div>
-    {% if request.user.user.is_authenticated and request.user.is_superuser %}
+    {% if request.user.is_authenticated and request.user.is_superuser %}
 <div class="card-footer text-center">
   <a href="{% url 'news_update' news.slug %}" class="btn btn-info">Tahrirlash</a>
   <a href="{% url 'news_delete' news.slug %}" class="btn btn-danger">O'chirish</a>
