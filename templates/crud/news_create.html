@@ -1,0 +1,28 @@
+{% extends 'news/base.html' %}
+{% load static %}
+
+{% block title %} Yangilik qo'shish {% endblock %}
+
+{% block content %}
+<h2 class="text-center"> Yangilik qo'shish </h2>
+<form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit" class="btn btn-primary ml-2"> Yangilik qo'shish </button>
+</form>
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    let titleInput = document.getElementById("id_title");
+    let slugInput = document.getElementById("id_slug");
+
+    titleInput.addEventListener("input", function() {
+        let slug = titleInput.value.toLowerCase()
+            .replace(/ /g, '-')        // bo'sh joylarni "-" ga almashtiradi
+            .replace(/[^\w-]+/g, '');  // belgilarni olib tashlaydi
+        slugInput.value = slug;
+    });
+});
+</script>
+
+{% endblock content %}

@@ -1,0 +1,27 @@
+{% extends 'news/base.html' %}
+{% load static %}
+
+{% block title %}Foydalanuvchi profili{% endblock %}
+
+{% block content %}
+<div style="margin:200px 30px 10px 30px;">
+    <h3>Xush kelibsiz, {{ user.username }}!</h3>
+    {% if profile.photo %}
+        <img src="{{ profile.photo.url }}" alt="User Profile" style="width:150px; height:150px; border-radius:50%;">
+    {% else %}
+        <img src="{% static 'images/default-avatar.png' %}" alt="User Profile" style="width:150px; height:150px; border-radius:50%;">
+    {% endif %}
+
+    <p><strong>Username:</strong> {{ user.username }}</p>
+    <p><strong>Email:</strong> {{ user.email }}</p>
+    <p><strong>Ism:</strong> {{ user.first_name }}</p>
+    <p><strong>Familiya:</strong> {{ user.last_name }}</p>
+    <p><strong>Tugilgan sana:</strong> {{ profile.date_of_birth }}</p>
+    <h4><a href="{% url 'password_change' %}" style="color:red;">Parolni o‘zgartirish</a> | 
+        <a href="{% url 'edit_user_information' %}" style="color:red;">Profilni o‘zgartirish</a></h4>
+    <form method="post" action="{% url 'logout' %}">
+        {% csrf_token %}
+        <button type="submit">Chiqish</button>
+    </form>
+</div>
+{% endblock %}

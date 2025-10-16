@@ -1,6 +1,6 @@
 {% extends 'news/base.html' %}
 {% load static %}
-
+{% load hitcount_tags %}
 
 
     {% block title %}{{ news.title }}{% endblock %}
@@ -12,7 +12,7 @@
   {{ news.title }}
 </h1>
   <p>
-    Published date: {{ news.publish_time }}
+    Published date: {{ news.publish_time }} | <i class="fa fa-eye" aria-hidden="true"></i> {% get_hit_count for news %} | Izohlar soni: {{ comment__count }}
   </p>
 <div style="display: flex; margin: 20px 0;">
   <img src="{{ news.image.url }}" alt="" style="width:500px">
@@ -20,6 +20,38 @@
     {{ news.body }}
   </p>
 </div>
+    {% if request.user.user.is_authenticated and request.user.is_superuser %}
+<div class="card-footer text-center">
+  <a href="{% url 'news_update' news.slug %}" class="btn btn-info">Tahrirlash</a>
+  <a href="{% url 'news_delete' news.slug %}" class="btn btn-danger">O'chirish</a>
+</div>
+    {% endif %} <br>
+<h2>Izohlar {{ comment_count }} </h2>
+{% for comment in comments %}
+<div class="comments"style="padding: 10px;">
+  <p class="comment-author"><strong>{{ comment.user }}</strong> - {{ comment.created_time }}
+  </p>
+  {{ comment.body | linebreaks }}
+  <hr>
+</div>
+{% endfor %}
+
+{% if user.is_authenticated %}
+
+<div>
+  <div class="comment-form" style="padding: 10px; border: 1px solid #ccc; border-radius: 5px;">
+    <h3>Izoh qoldirish</h3>
+    <form method="post">
+      {% csrf_token %}
+      {{ comment_form.as_p }}
+      <button type="submit" class="btn btn-primary btn-lg">Yuborish</button>
+    </form>
+  </div>
+</div>
+{% else %}
+<p class="text-muted">Izoh qoldirish uchun tizimga kiring.</p>
+<p><a href="{% url 'login' %}">Kirish</a> | <a href="{% url 'user_register' %}">Ro'yxatdan o'tish</a></p>
+{% endif %}
 
 
 {% endblock content %}
