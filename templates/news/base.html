@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 {% load static %}
+{% load i18n %}
 <html>
 <head>
 <title>{% block title%} {% endblock title %}</title>
@@ -15,6 +16,24 @@
 <link rel="stylesheet" type="text/css" href="{% static 'css/jquery.fancybox.css' %}">
 <link rel="stylesheet" type="text/css" href="{% static 'css/theme.css' %}">
 <link rel="stylesheet" type="text/css" href="{% static 'css/style.css' %}">
+<!-- Custom overrides come last -->
+<link rel="stylesheet" type="text/css" href="{% static 'css/custom.css' %}">
+
+<style>
+  /* Lightweight spacing/polish for header buttons */
+  .language-form { display: inline-flex; align-items: center; gap: 6px; margin: 0; }
+  .auth-actions { display: flex; align-items: center; justify-content: flex-end; gap: 8px; }
+  .auth-actions .btn { margin: 0; }
+  .navbar-form { margin: 8px 0 0 0; padding: 0; }
+  .navbar-form .form-control { height: 30px; }
+  .navbar-form .btn { height: 30px; padding: 4px 10px; }
+  .top_nav { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+  .top_nav li { list-style: none; }
+  .top_nav a.btn { color: #fff !important; }
+  @media (max-width: 768px) {
+    .auth-actions { justify-content: flex-start; margin-top: 8px; }
+  }
+</style>
 
 </head>
 <body>
@@ -35,26 +54,51 @@
               {% if user.is_authenticated %}
               <li><a href="{% url 'admin_page' %}">Admin sahifasi</a></li>
               {% endif %}
+              <li>
+                <form action="{% url 'set_language' %}" method="post" class="language-form" aria-label="Tilni tanlash">
+                  {% csrf_token %}
+                  <input name="next" type="hidden" value="{{ redirect_to }}">
+                  <select name="language" class="form-control input-sm">
+                      {% get_current_language as LANGUAGE_CODE %}
+                      {% get_available_languages as LANGUAGES %}
+                      {% get_language_info_list for LANGUAGES as languages %}
+                      {% for language in languages %}
+                          <option value="{{ language.code }}"{% if language.code == LANGUAGE_CODE %} selected{% endif %}>
+                              {{ language.name_local }} ({{ language.code }})
+                          </option>
+                      {% endfor %}
+                   </select>
+                   <button type="submit" class="btn btn-default btn-sm"><i class="fa fa-globe"></i> Go</button>
+                </form>
+              </li>
             </ul>
           </div>
           <div class="header_top_right">
-            {% if user.is_authenticated %}
-            <form method="post" action="{% url 'logout' %}">
-              {% csrf_token %}
-              <button type="submit">Chiqish</button>
-            </form>
-            <p><a href="{% url 'user_profile' %}" style="color:green">My profile</a></p>
-            {% else %}
-            <p><a href="{% url 'login' %}" style="color:green">Kirish</a></p>
-            {% endif %}
-            <p>{% now "jS F Y H:i" %}</p>
+            <div class="auth-actions">
+              {% if user.is_authenticated %}
+                <a href="{% url 'user_profile' %}" class="btn btn-success btn-sm" aria-label="Profil">
+                  <i class="fa fa-user"></i> Profil
+                </a>
+                <form method="post" action="{% url 'logout' %}" style="display:inline" aria-label="Chiqish">
+                  {% csrf_token %}
+                  <button type="submit" class="btn btn-danger btn-sm">
+                    <i class="fa fa-sign-out"></i> Chiqish
+                  </button>
+                </form>
+              {% else %}
+                <a href="{% url 'login' %}" class="btn btn-primary btn-sm" aria-label="Kirish">
+                  <i class="fa fa-sign-in"></i> Kirish
+                </a>
+              {% endif %}
+              <span class="text-muted" style="font-size:12px;"><i class="fa fa-clock-o"></i> {% now "jS F Y H:i" %}</span>
+            </div>
 
           </div>
         </div>
       </div>
       <div class="col-lg-12 col-md-12 col-sm-12">
         <div class="header_bottom">
-          <div class="logo_area"><a href="{% url "home_page" %}" class="logo"><img src="{% static 'images/logo.jpg' %}" alt=""></a></div>
+          <div class="logo_area"><a href="{% url 'home_page' %}" class="logo"><img src="{% static 'images/logo.jpg' %}" alt=""></a></div>
           <div class="add_banner"><a href="#"><img src="{% static 'images/addbanner_728x90_V1.jpg' %}" alt=""></a></div>
         </div>
       </div>
@@ -74,9 +118,13 @@
           <li><a href="{% url 'sport_news_page' %}">Sport</a></li>
           <li><a href="{% url 'contact_page' %}">Aloqa</a></li>
           <li>
-            <form method="get" action="{% url 'search_results' %}" style="margin-top:8px; display:flex;">
-              <input type="text" name="q" placeholder="Qidiruv..." style="padding:5px; border-radius:5px; border:none;"/>
-              <button type="submit" style="padding:5px 10px; margin-left:5px; border-radius:5px; border:none; background-color:#337ab7; color:white;">Qidirish</button>
+            <form method="get" action="{% url 'search_results' %}" class="navbar-form" role="search" aria-label="Sayt bo'ylab qidirish">
+              <div class="input-group input-group-sm">
+                <input type="text" name="q" class="form-control" placeholder="Qidiruv..." aria-label="Qidiruv"/>
+                <span class="input-group-btn">
+                  <button type="submit" class="btn btn-primary"><i class="fa fa-search"></i></button>
+                </span>
+              </div>
             </form>
           </li>
         </ul>
