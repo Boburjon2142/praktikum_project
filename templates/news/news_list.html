@@ -1,17 +1,33 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>News list</title>
-</head>
-<body>
-<h1>All news list</h1>
-{% for news in news_list %}
-<a href="{% url 'news_detail_page' news.pk %}">
-    <li>
-            {{ news.title }}
-    </li>
-</a>
-{% endfor %}
-</body>
-</html>
+{% extends 'news/base.html' %}
+{% load static %}
+{% load i18n %}
+{% load hitcount_tags %}
+
+{% block title %}Barcha yangiliklar{% endblock title %}
+{% block content %}
+<section class="container">
+  <div class="section-header">
+    <h2 class="section-title">Barcha yangiliklar</h2>
+  </div>
+  {% for news in news_list %}
+    <a class="category-item" href="{% url 'news_detail_page' news.slug %}">
+      <div class="media">
+        <div class="media-left">
+          {% if news.image %}
+            <img src="{{ news.image.url }}" alt="{{ news.title }}" />
+          {% else %}
+            <img src="{% static 'images/featured_img1.jpg' %}" alt="{{ news.title }}" />
+          {% endif %}
+        </div>
+        <div class="media-body">
+          <h3 class="catg_title">{{ news.title }}</h3>
+          <p class="text-muted">{% trans "Ko`rilganlar soni" %}: {% get_hit_count for news %} | {% trans "Izohlar" %}: {{ news.comments.count }}</p>
+          <p class="excerpt">{{ news.body|striptags|truncatewords:24 }}</p>
+        </div>
+      </div>
+    </a>
+  {% empty %}
+    <p class="text-muted">Hech qanday yangilik topilmadi.</p>
+  {% endfor %}
+</section>
+{% endblock content %}

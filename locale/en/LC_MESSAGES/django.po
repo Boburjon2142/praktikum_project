@@ -1,0 +1,65 @@
+msgid ""
+msgstr "Content-Type: text/plain; charset=UTF-8\nLanguage: en\nPlural-Forms: nplurals=2; plural=(n != 1);\n"
+
+# Navigation
+msgid "Bosh sahifa"
+msgstr "Home"
+
+msgid "Biz haqimizda"
+msgstr "About"
+
+msgid "Aloqa"
+msgstr "Contact"
+
+msgid "Admin sahifasi"
+msgstr "Admin Page"
+
+msgid "Profil"
+msgstr "Profile"
+
+msgid "Chiqish"
+msgstr "Logout"
+
+msgid "Mahalliy"
+msgstr "Local"
+
+msgid "Xorij"
+msgstr "Foreign"
+
+msgid "Texnologiya"
+msgstr "Technology"
+
+msgid "Sport"
+msgstr "Sport"
+
+# Headlines and labels
+msgid "So'ngi yangiliklar"
+msgstr "Latest news"
+
+msgid "Kategoriyani tanlang"
+msgstr "Choose a category"
+
+msgid "Men bilan aloqa"
+msgstr "Contact me"
+
+msgid "Developed By Boburjon Akramjonovich"
+msgstr "Developed by Boburjon Akramjonovich"
+
+msgid "Qidiruv..."
+msgstr "Search..."
+
+msgid "Qidiruv"
+msgstr "Search"
+
+# Page titles
+msgid "Mahalliy xabarlar"
+msgstr "Local news"
+
+msgid "Sport xabarlari"
+msgstr "Sports news"
+
+msgid "Xorij xabarlari"
+msgstr "Foreign news"
+
+msgid "Texnologiya xabarlari"
+msgstr "Technology news"

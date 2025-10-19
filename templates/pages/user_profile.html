@@ -1,27 +1,66 @@
 {% extends 'news/base.html' %}
 {% load static %}
+{% load i18n %}
 
-{% block title %}Foydalanuvchi profili{% endblock %}
+{% block title %}{% trans "Foydalanuvchi profili" %}{% endblock %}
 
 {% block content %}
-<div style="margin:200px 30px 10px 30px;">
-    <h3>Xush kelibsiz, {{ user.username }}!</h3>
-    {% if profile.photo %}
-        <img src="{{ profile.photo.url }}" alt="User Profile" style="width:150px; height:150px; border-radius:50%;">
-    {% else %}
-        <img src="{% static 'images/default-avatar.png' %}" alt="User Profile" style="width:150px; height:150px; border-radius:50%;">
-    {% endif %}
+<section class="container auth-container">
+  <div class="section-header">
+    <h2 class="section-title">{% trans "Profil" %}</h2>
+  </div>
 
-    <p><strong>Username:</strong> {{ user.username }}</p>
-    <p><strong>Email:</strong> {{ user.email }}</p>
-    <p><strong>Ism:</strong> {{ user.first_name }}</p>
-    <p><strong>Familiya:</strong> {{ user.last_name }}</p>
-    <p><strong>Tugilgan sana:</strong> {{ profile.date_of_birth }}</p>
-    <h4><a href="{% url 'password_change' %}" style="color:red;">Parolni o‘zgartirish</a> | 
-        <a href="{% url 'edit_user_information' %}" style="color:red;">Profilni o‘zgartirish</a></h4>
-    <form method="post" action="{% url 'logout' %}">
-        {% csrf_token %}
-        <button type="submit">Chiqish</button>
-    </form>
-</div>
+  <div class="card" style="padding: 20px;">
+    <div class="row" style="align-items:center;">
+      <div class="col-sm-3" style="text-align:center;">
+        {% if profile.photo %}
+          <img src="{{ profile.photo.url }}" alt="{{ user.username }}" style="width:140px; height:140px; border-radius:50%; object-fit:cover; box-shadow: var(--card-shadow);">
+        {% else %}
+          <img src="{% static 'images/default-avatar.png' %}" alt="{{ user.username }}" style="width:140px; height:140px; border-radius:50%; object-fit:cover; box-shadow: var(--card-shadow);">
+        {% endif %}
+      </div>
+      <div class="col-sm-6">
+        <h3 style="margin:0 0 6px">@{{ user.username }}</h3>
+        <p class="text-muted" style="margin:0 0 8px">{{ user.first_name }} {{ user.last_name }}</p>
+        <p style="margin:0 0 4px"><strong>Email:</strong> {{ user.email|default:"—" }}</p>
+        <p style="margin:0 0 4px"><strong>{% trans "Tug'ilgan sana" %}:</strong> {{ profile.date_of_birth|date:"Y-m-d"|default:"—" }}</p>
+        <p class="text-muted" style="margin:0"><strong>{% trans "Ro'yxatdan" %}:</strong> {{ user.date_joined|date:"Y-m-d H:i" }} · <strong>{% trans "Oxirgi kirish" %}:</strong> {{ user.last_login|date:"Y-m-d H:i" }}</p>
+      </div>
+      <div class="col-sm-3" style="text-align:right;">
+        <a href="{% url 'edit_user_information' %}" class="btn btn-info" style="margin-bottom:6px;">{% trans "Profilni o'zgartirish" %}</a>
+        <a href="{% url 'password_change' %}" class="btn btn-default" style="margin-bottom:6px;">{% trans "Parolni o'zgartirish" %}</a>
+        <form method="post" action="{% url 'logout' %}">
+          {% csrf_token %}
+          <button type="submit" class="btn btn-danger">{% trans "Chiqish" %}</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <div class="row" style="margin-top: 14px;">
+    <div class="col-sm-6">
+      <div class="card">
+        <h4 style="margin-top:0;">{% trans "Shaxsiy ma'lumotlar" %}</h4>
+        <ul style="margin:0; padding-left: 16px;">
+          <li><strong>{% trans "Foydalanuvchi" %}:</strong> {{ user.username }}</li>
+          <li><strong>{% trans "Ism" %}:</strong> {{ user.first_name|default:"—" }}</li>
+          <li><strong>{% trans "Familiya" %}:</strong> {{ user.last_name|default:"—" }}</li>
+          <li><strong>Email:</strong> {{ user.email|default:"—" }}</li>
+          <li><strong>{% trans "Tug'ilgan sana" %}:</strong> {{ profile.date_of_birth|date:"Y-m-d"|default:"—" }}</li>
+        </ul>
+      </div>
+    </div>
+    <div class="col-sm-6">
+      <div class="card">
+        <h4 style="margin-top:0;">{% trans "Hisob ma'lumotlari" %}</h4>
+        <ul style="margin:0; padding-left: 16px;">
+          <li><strong>{% trans "Ro'yxatdan" %}:</strong> {{ user.date_joined|date:"Y-m-d H:i" }}</li>
+          <li><strong>{% trans "Oxirgi kirish" %}:</strong> {{ user.last_login|date:"Y-m-d H:i" }}</li>
+          <li><strong>{% trans "Holat" %}:</strong> {% if user.is_active %}{% trans "Faol" %}{% else %}{% trans "Nofaol" %}{% endif %}</li>
+          <li><strong>{% trans "Rollar" %}:</strong> {% if user.is_superuser %}Superadmin{% elif user.is_staff %}Admin{% else %}{% trans "Oddiy foydalanuvchi" %}{% endif %}</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
 {% endblock %}

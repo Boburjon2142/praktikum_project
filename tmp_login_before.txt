@@ -1,0 +1,38 @@
+{% extends 'news/base.html' %}
+{% load static %}
+{% load i18n %}
+
+{% block title %} {% trans "Kirish" %} {% endblock title %}
+
+{% block content %}
+<section class="container auth-container">
+  <div class="section-header">
+    <h2 class="section-title">{% trans "Kirish" %}</h2>
+  </div>
+  <div class="card auth-card">
+    <form method="post" novalidate>
+      {% csrf_token %}
+      {% if form.non_field_errors %}
+        <div class="alert alert-danger" role="alert">{{ form.non_field_errors|striptags }}</div>
+      {% endif %}
+      {% for field in form %}
+        <div class="form-group">
+          <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+          {{ field }}
+          {% if field.errors %}
+            <div class="text-danger small">{{ field.errors|striptags }}</div>
+          {% endif %}
+        </div>
+      {% endfor %}
+      <button type="submit" class="btn btn-primary" style="width:100%;">{% trans "Kirish" %}</button>
+    </form>
+    <div class="auth-links">
+      <a href="{% url 'password_reset' %}">{% trans "Parolni unutdingizmi?" %}</a>
+      <span> · </span>
+      <a href="{% url 'user_register' %}">{% trans "Ro'yxatdan o'tish" %}</a>
+    </div>
+  </div>
+</section>
+{% endblock content %}
+
+

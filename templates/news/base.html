@@ -22,14 +22,31 @@
 <style>
   /* Lightweight spacing/polish for header buttons */
   .language-form { display: inline-flex; align-items: center; gap: 6px; margin: 0; }
-  .auth-actions { display: flex; align-items: center; justify-content: flex-end; gap: 8px; }
-  .auth-actions .btn { margin: 0; }
+  .auth-actions { display: flex; align-items: center; justify-content: flex-end; gap: 8px; flex-wrap: wrap; }
+  .auth-actions .btn { margin: 6px 0 0 0; height: 30px; padding: 4px 10px; line-height: 20px; }
+  .auth-actions .btn-group .btn { height: 30px; padding: 4px 10px; }
+  .auth-actions form { display: inline; margin: 0; }
   .navbar-form { margin: 8px 0 0 0; padding: 0; }
   .navbar-form .form-control { height: 30px; }
   .navbar-form .btn { height: 30px; padding: 4px 10px; }
   .top_nav { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
   .top_nav li { list-style: none; }
   .top_nav a.btn { color: #fff !important; }
+  /* Green style for language selector */
+  .language-form .form-control {
+    background-color: #28a745; /* green */
+    color: #fff;
+    border-color: #1e7e34;
+    font-weight: 700; /* bold text */
+  }
+  .language-form .form-control:focus {
+    background-color: #218838;
+    color: #fff;
+    border-color: #1c7430;
+    box-shadow: none;
+  }
+  /* Ensure dropdown options remain readable */
+  .language-form select option { color: #000; }
   @media (max-width: 768px) {
     .auth-actions { justify-content: flex-start; margin-top: 8px; }
   }
@@ -41,24 +58,27 @@
   <div id="status">&nbsp;</div>
 </div>
 <a class="scrollToTop" href="#"><i class="fa fa-angle-up"></i></a>
-<div class="container">
+<div class="container-fluid">
   <header id="header">
     <div class="row">
       <div class="col-lg-12 col-md-12 col-sm-12">
         <div class="header_top">
           <div class="header_top_left">
             <ul class="top_nav">
-              <li><a href="{% url 'home_page' %}">Bosh sahifa</a></li>
-              <li><a href="{% url 'about_page' %}">Biz haqimizda</a></li>
-              <li><a href="{% url 'contact_page' %}">Aloqa</a></li>
+              <li><a href="{% url 'home_page' %}">{% trans "Bosh sahifa" %}</a></li>
+              <li><a href="{% url 'about_page' %}">{% trans "Biz haqimizda" %}</a></li>
+              <li><a href="{% url 'contact_page' %}">{% trans "Aloqa" %}</a></li>
               {% if user.is_authenticated %}
-              <li><a href="{% url 'admin_page' %}">Admin sahifasi</a></li>
+              <li><a href="{% url 'admin_page' %}">{% trans "Admin sahifasi" %}</a></li>
               {% endif %}
-              <li>
+            </ul>
+          </div>
+          <div class="header_top_right" style="display: flex; gap: 15px; flex-wrap: wrap; justify-content: flex-end; align-items: center;">
+            <div style="flex-grow: 1; min-width: 200px; margin-top: 8px;">
                 <form action="{% url 'set_language' %}" method="post" class="language-form" aria-label="Tilni tanlash">
                   {% csrf_token %}
                   <input name="next" type="hidden" value="{{ redirect_to }}">
-                  <select name="language" class="form-control input-sm">
+                  <select name="language" class="form-control input-sm" onchange="this.form.submit()">
                       {% get_current_language as LANGUAGE_CODE %}
                       {% get_available_languages as LANGUAGES %}
                       {% get_language_info_list for LANGUAGES as languages %}
@@ -68,89 +88,96 @@
                           </option>
                       {% endfor %}
                    </select>
-                   <button type="submit" class="btn btn-default btn-sm"><i class="fa fa-globe"></i> Go</button>
+                   
                 </form>
-              </li>
-            </ul>
-          </div>
-          <div class="header_top_right">
-            <div class="auth-actions">
+            </div>
+            <div class="auth-actions" style="align-items: center; padding-top: 8px;">
               {% if user.is_authenticated %}
-                <a href="{% url 'user_profile' %}" class="btn btn-success btn-sm" aria-label="Profil">
-                  <i class="fa fa-user"></i> Profil
-                </a>
-                <form method="post" action="{% url 'logout' %}" style="display:inline" aria-label="Chiqish">
-                  {% csrf_token %}
-                  <button type="submit" class="btn btn-danger btn-sm">
-                    <i class="fa fa-sign-out"></i> Chiqish
-                  </button>
-                </form>
+                <div class="btn-group btn-group-sm" role="group" aria-label="Foydalanuvchi amallari">
+                  <a href="{% url 'user_profile' %}" class="btn btn-success btn-profile" aria-label="{% trans "Profil" %}">
+                    <i class="fa fa-user"></i> {% trans "Profil" %}
+                  </a>
+                  <form method="post" action="{% url 'logout' %}" aria-label="{% trans "Chiqish" %}">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-success btn-logout">
+                      <i class="fa fa-sign-out"></i> {% trans "Chiqish" %}
+                    </button>
+                  </form>
+                </div>
               {% else %}
-                <a href="{% url 'login' %}" class="btn btn-primary btn-sm" aria-label="Kirish">
-                  <i class="fa fa-sign-in"></i> Kirish
-                </a>
+                <div class="btn-group btn-group-sm" role="group" aria-label="Kirish va ro'yxatdan o'tish">
+                  <a href="{% url 'login' %}" class="btn btn-primary" aria-label="Kirish">
+                    <i class="fa fa-sign-in"></i> Kirish
+                  </a>
+                  <a href="{% url 'user_register' %}" class="btn btn-success btn-register" aria-label="Ro'yxatdan o'tish">
+                    <i class="fa fa-user-plus"></i> Ro'yxatdan o'tish
+                  </a>
+                </div>
               {% endif %}
-              <span class="text-muted" style="font-size:12px;"><i class="fa fa-clock-o"></i> {% now "jS F Y H:i" %}</span>
             </div>
 
           </div>
         </div>
       </div>
-      <div class="col-lg-12 col-md-12 col-sm-12">
-        <div class="header_bottom">
-          <div class="logo_area"><a href="{% url 'home_page' %}" class="logo"><img src="{% static 'images/logo.jpg' %}" alt=""></a></div>
-          <div class="add_banner"><a href="#"><img src="{% static 'images/addbanner_728x90_V1.jpg' %}" alt=""></a></div>
-        </div>
-      </div>
+      
     </div>
-  </header>
-  <section id="navArea">
+
     <nav class="navbar navbar-inverse" role="navigation">
       <div class="navbar-header">
         <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar"> <span class="sr-only">Toggle navigation</span> <span class="icon-bar"></span> <span class="icon-bar"></span> <span class="icon-bar"></span> </button>
       </div>
-      <div id="navbar" class="navbar-collapse collapse">
-        <ul class="nav navbar-nav main_nav">
+      <div id="navbar" class="navbar-collapse collapse" style="display: flex; justify-content: space-between; align-items: center;">
+        <div>
+          <ul class="nav navbar-nav main_nav">
           <li class="active"><a href="{% url 'home_page' %}"><span class="fa fa-home desktop-home"></span><span class="mobile-show">Home</span></a></li>
-          <li><a href="{% url 'local_news_page' %}">Mahalliy</a></li>
-          <li> <a href="{% url 'foreign_news_page' %}" >Xorij</a></li>
-          <li><a href="{% url 'technology_news_page' %}">Texnologiya</a></li>
-          <li><a href="{% url 'sport_news_page' %}">Sport</a></li>
-          <li><a href="{% url 'contact_page' %}">Aloqa</a></li>
-          <li>
-            <form method="get" action="{% url 'search_results' %}" class="navbar-form" role="search" aria-label="Sayt bo'ylab qidirish">
+              <li><a href="{% url 'local_news_page' %}">{% trans "Mahalliy" %}</a></li>
+          <li> <a href="{% url 'foreign_news_page' %}" >{% trans "Xorij" %}</a></li>
+          <li><a href="{% url 'technology_news_page' %}">{% trans "Texnologiya" %}</a></li>
+          <li><a href="{% url 'sport_news_page' %}">{% trans "Sport" %}</a></li>
+          <li><a href="{% url 'contact_page' %}">{% trans "Aloqa" %}</a></li>
+        </ul>
+        </div>
+        <div style="margin-right: 16px;">
+            <form method="get" action="{% url 'search_results' %}" class="navbar-form navbar-right" role="search" aria-label="Sayt bo'ylab qidirish">
               <div class="input-group input-group-sm">
-                <input type="text" name="q" class="form-control" placeholder="Qidiruv..." aria-label="Qidiruv"/>
+                <input type="text" name="q" class="form-control" placeholder="{% trans 'Qidiruv...' %}" aria-label="{% trans 'Qidiruv' %}"/>
                 <span class="input-group-btn">
                   <button type="submit" class="btn btn-primary"><i class="fa fa-search"></i></button>
                 </span>
               </div>
             </form>
-          </li>
-        </ul>
+        </div>
       </div>
     </nav>
-  </section>
+</header>
   <section id="newsSection">
     <div class="row">
       <div class="col-lg-12 col-md-12">
-        <div class="latest_newsarea"> <span>So'ngi yangiliklar</span>
+        <div class="latest_newsarea"> <span>{% trans "So'ngi yangiliklar" %}</span>
           <ul id="ticker01" class="news_sticker">
             {% for news in latest_news %}
-            <li><a href="#"><img src="{{ news.image.url }}" alt="">{{ news.title }}</a></li>
+            <li>
+              <a href="#">
+                {% if news.image %}
+                  <img src="{{ news.image.url }}" alt="">{{ news.title }}
+                {% else %}
+                  <img src="{% static 'images/featured_img1.jpg' %}" alt="">{{ news.title }}
+                {% endif %}
+              </a>
+            </li>
             {% endfor %}
-          </ul>
+          {% comment %} </ul>
           <div class="social_area">
-            <ul class="social_nav">
-              <li class="facebook"><a href="#"></a></li>
-              <li class="twitter"><a href="#"></a></li>
-              <li class="flickr"><a href="#"></a></li>
-              <li class="pinterest"><a href="#"></a></li>
-              <li class="googleplus"><a href="#"></a></li>
-              <li class="vimeo"><a href="#"></a></li>
-              <li class="youtube"><a href="#"></a></li>
-              <li class="mail"><a href="#"></a></li>
-            </ul>
+            <ul class="social_nav" style="display: flex; gap: 10px; text-align: center;">
+              <li class="facebook"><a href="#" aria-label="Facebook"><i class="fa fa-facebook"></i></a></li>
+              <li class="twitter"><a href="#" aria-label="Twitter / X"><i class="fa fa-twitter"></i></a></li>
+              <li class="flickr"><a href="#" aria-label="Flickr"><i class="fa fa-flickr"></i></a></li>
+              <li class="pinterest"><a href="#" aria-label="Pinterest"><i class="fa fa-pinterest"></i></a></li>
+              <li class="googleplus"><a href="#" aria-label="Google Plus"><i class="fa fa-google-plus"></i></a></li>
+              <li class="vimeo"><a href="#" aria-label="Vimeo"><i class="fa fa-vimeo-square"></i></a></li>
+              <li class="youtube"><a href="#" aria-label="YouTube"><i class="fa fa-youtube"></i></a></li>
+              <li class="mail"><a href="#" aria-label="Email"><i class="fa fa-envelope"></i></a></li>
+            </ul> {% endcomment %}
           </div>
         </div>
       </div>
@@ -170,7 +197,7 @@
         </div>
         <div class="col-lg-4 col-md-4 col-sm-4">
           <div class="footer_widget wow fadeInDown">
-            <h2>Kategoriyani tanlang</h2>
+            <h2>{% trans "Kategoriyani tanlang" %}</h2>
             <ul class="tag_nav">
               {% for category in categories %}
               <li><a href="#"> {{ category.name|upper }} </a></li>
@@ -180,7 +207,7 @@
         </div>
         <div class="col-lg-4 col-md-4 col-sm-4">
           <div class="footer_widget wow fadeInRightBig">
-            <h2>Men bilan aloqa</h2>
+            <h2>{% trans "Men bilan aloqa" %}</h2>
             <p> Abdug'aniyev Boburjon Akramjon o'g'li (Qarshi davlat universiteti inkubatsiya markazi)ga aloqador barcha yangiliklarni kuzatib boring.</p>
             <address>
             Qarshi davlat universiteti . Phone: +998 91 963 07 70 Email: boburjonabduganiyev83@gmail.com
@@ -191,7 +218,7 @@
     </div>
     <div class="footer_bottom">
       <p class="copyright">Copyright &copy; 2025 <a href="index.html">NewsFeed</a></p>
-      <p class="developer">Developed By Boburjon Akramjonovich</p>
+      <p class="developer">{% trans "Developed By Boburjon Akramjonovich" %}</p>
     </div>
   </footer>
 </div>
@@ -206,6 +233,60 @@
 <script src="{% static 'js/custom.js' %}"></script>
 <script src="{% static 'js/html5shiv.min.js' %}"></script>
 <script src="{% static 'js/respond.min.js' %}"></script>
+<script>
+  // Auto-submit language switcher on change
+  document.addEventListener('DOMContentLoaded', function () {
+    var form = document.querySelector('.language-form');
+    if (!form) return;
+    var select = form.querySelector('select[name="language"]');
+    if (!select) return;
+    select.addEventListener('change', function () {
+      var nextInput = form.querySelector('input[name="next"]');
+      if (nextInput) {
+        try {
+          nextInput.value = window.location.pathname + window.location.search + window.location.hash;
+        } catch (e) { /* noop */ }
+      }
+      form.submit();
+    });
+  });
+  </script>
+  <script>
+  // Technology sidebar sizing
+  document.addEventListener('DOMContentLoaded', function () {
+    function resizeTechSidebar() {
+      var el = document.querySelector('.technology-sidebar-fill');
+      if (!el) return;
+      // If marked as fixed to items count, don't force height
+      if (el.hasAttribute('data-fixed-items')) {
+        el.style.minHeight = 'auto';
+        el.style.maxHeight = 'none';
+        var listEl = el.querySelector('.spost_nav');
+        if (listEl) {
+          listEl.style.maxHeight = 'none';
+          listEl.style.overflowY = 'visible';
+        }
+        return;
+      }
+      var rect = el.getBoundingClientRect();
+      var viewport = window.innerHeight || document.documentElement.clientHeight;
+      var available = Math.max(200, viewport - rect.top - 10); // 10px bottom padding
+      el.style.minHeight = available + 'px';
+      el.style.maxHeight = available + 'px';
+      var list = el.querySelector('.spost_nav');
+      if (list) {
+        var h2 = el.querySelector('h2');
+        var headerH = h2 ? h2.offsetHeight : 0;
+        var inner = Math.max(120, available - headerH - 16);
+        list.style.maxHeight = inner + 'px';
+        list.style.overflowY = 'auto';
+      }
+    }
+    resizeTechSidebar();
+    window.addEventListener('resize', resizeTechSidebar);
+    window.addEventListener('scroll', resizeTechSidebar, { passive: true });
+  });
+  </script>
 {% endblock javascript %}
 </body>
 </html>

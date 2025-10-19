@@ -4,8 +4,9 @@ from django.urls import reverse_lazy
 from django.views.generic import TemplateView, ListView, UpdateView, CreateView, DeleteView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from .models import News, Category
-from django.db.models import Q
+from django.db.models import Q, Count
 from .forms import CommentForm, ContactForm
+from .utils import notify_telegram
 from django.contrib.auth.decorators import login_required, user_passes_test
 from newsproject.custom_permissions import OnlyLoggedSuperUser
 from django.contrib.auth.models import User
@@ -94,7 +95,7 @@ class HomePageView(ListView):
         context['mahalliy_xabarlar'] = News.published.filter(category__name='Mahalliy').order_by("-publish_time")[:5]
         context['xorij_xabarlari'] = News.published.filter(category__name='Xorij').order_by("-publish_time")[:5]
         context['sport_xabarlari'] = News.published.filter(category__name='Sport').order_by("-publish_time")[:5]
-        context['texnologiya_xabarlari'] = News.published.filter(category__name='Texnologiya').order_by("-publish_time")[:5]
+        context['texnologiya_xabarlari'] = News.published.filter(category__name='Texnologiya').order_by("-publish_time")[:10]
         return context
 
 
@@ -122,7 +123,14 @@ class ContactPageView(TemplateView):
     def post(self, request, *args, **kwargs):
         form = ContactForm(request.POST)
         if request.method == 'POST' and form.is_valid():
-            form.save()
+            obj = form.save()
+            # Send to Telegram (best-effort; ignores errors if not configured)
+            try:
+                notify_telegram(
+                    f"Yangi aloqa xabari:\nIsm: {obj.name}\nEmail: {obj.email}\nXabar: {obj.message}"
+                )
+            except Exception:
+                pass
             return HttpResponse("<h2>Biz bilan bog'langaningiz uchun tashakkur!</h2>")
         context = {
                 "form":form
@@ -196,18 +204,43 @@ class NewsDeleteView(OnlyLoggedSuperUser, DeleteView):
 class NewsCreateView(OnlyLoggedSuperUser, CreateView):
     model = News
     template_name = 'crud/news_create.html'
-    fields = ('title', 'slug', 'body', 'image', 'category', 'status' )
+    fields = ('title', 'title_uz', 'title_en', 'title_ru','slug', 'body','body_uz', 'body_en', 'body_ru', 'image', 'category', 'status' )
     
+ 
+
+ 
+
 @login_required
 @user_passes_test(lambda u:u.is_superuser)
 def admin_page_view(request):
     admin_users = User.objects.filter(is_superuser=True)
-    
+    # Basic stats
+    total_news = News.objects.count()
+    published_news = News.objects.filter(status=News.Status.Published).count()
+    draft_news = News.objects.filter(status=News.Status.Draft).count()
+    latest_news = News.objects.order_by('-publish_time')[:10]
+
+    # Category counts (simple loop to avoid annotation confusion)
+    category_info = []
+    for cat in Category.objects.all():
+        category_info.append({
+            'name': cat.name,
+            'total': News.objects.filter(category=cat).count(),
+            'published': News.published.filter(category=cat).count(),
+        })
+
     context = {
-        'admin_users': admin_users
+        'admin_users': admin_users,
+        'total_news': total_news,
+        'published_news': published_news,
+        'draft_news': draft_news,
+        'latest_news': latest_news,
+        'category_info': category_info,
     }
-    
+
     return render(request, 'pages/admin_page.html', context)
+
+ 
 
 class SearchResultList(ListView):
     model = News
@@ -218,6 +251,39 @@ class SearchResultList(ListView):
         query = (self.request.GET.get('q') or '').strip()
         if not query:
             return News.published.none()
-        return News.published.filter(
-            Q(title__icontains=query) | Q(body__icontains=query)
-        )
+        # Support multi-word queries and search in title, body, slug and category name
+        tokens = [t for t in query.split() if t]
+        qs = News.published.all()
+        if not tokens:
+            return qs.none()
+        cond = Q()
+        for t in tokens:
+            cond |= (
+                Q(title__icontains=t) |
+                Q(body__icontains=t) |
+                Q(slug__icontains=t) |
+                Q(category__name__icontains=t)
+            )
+        return qs.filter(cond).distinct()
+
+    def get_context_data(self, **kwargs):
+        ctx = super().get_context_data(**kwargs)
+        ctx['query'] = (self.request.GET.get('q') or '').strip()
+        return ctx
+
+import requests
+from django.conf import settings
+
+def send_to_telegram(message):
+    token = settings.TELEGRAM_BOT_TOKEN
+    chat_id = settings.TELEGRAM_CHAT_ID
+    url = f"https://api.telegram.org/bot{token}/sendMessage"
+    data = {"chat_id": chat_id, "text": message}
+    requests.post(url, data=data)
+
+def contact_view(request):
+    if request.method == "POST":
+        name = request.POST.get("name")
+        message = request.POST.get("message")
+        send_to_telegram(f"Yangi xabar!\nIsm: {name}\nXabar: {message}")
+    return render(request, "contact.html")

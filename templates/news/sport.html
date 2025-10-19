@@ -1,24 +1,37 @@
 {% extends 'news/base.html' %}
 {% load static %}
+{% load i18n %}
+{% load hitcount_tags %}
 
 
-{% block title %} Sport xabarlari {% endblock title %}
+{% block title %} {% blocktrans %}Sport xabarlari{% endblocktrans %} {% endblock title %}
 
 
 
 {% block content %}
-<div style="margin:340px 30px 10px 30px;">
-
-    {% for news in sport_yangiliklari %}
-            <div class="container">
-            <a href="{{ news.get_absolute_url }}">
-            <div class="row" style="display: flex; margin-bottom: 20px;">
-                <img src="{{ news.image.url }}" alt="{{ news.title }}" style="width:300px; height:200px; border-radius:8px;">
-                <h2><div style="display:inline-block; line-height: 1.8; text-align: justify; margin-left: 20px; margin-right: 80px; ">{{ news.title }}</div></h2>
-            </div>
-            </a>
+<section class="category-page container">
+  <div class="section-header">
+    <h2 class="section-title">{% blocktrans %}Sport{% endblocktrans %}</h2>
+  </div>
+  {% for news in sport_yangiliklari %}
+    <a class="category-item" href="{{ news.get_absolute_url }}">
+      <div class="media wow fadeInDown">
+        <div class="media-left">
+          {% if news.image %}
+            <img src="{{ news.image.url }}" alt="{{ news.title }}">
+          {% else %}
+            <img src="{% static 'images/featured_img1.jpg' %}" alt="{{ news.title }}">
+          {% endif %}
         </div>
-    {% endfor %}
-
-</div>
+        <div class="media-body">
+          <h2 class="catg_title">{{ news.title }}</h2>
+          <p class="text-muted">{% blocktrans %}Ko`rilganlar soni:{% endblocktrans %} {% get_hit_count for news %} | {% trans "Izohlar" %}: {{ news.comments.count }}</p>
+          <p class="excerpt">{{ news.body|striptags|truncatewords:24 }}</p>
+        </div>
+      </div>
+    </a>
+  {% empty %}
+    <p class="text-muted">{% trans "Hozircha sport yangiliklar yo'q." %}</p>
+  {% endfor %}
+</section>
 {% endblock content %}

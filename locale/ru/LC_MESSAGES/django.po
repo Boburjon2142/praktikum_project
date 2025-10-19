@@ -1,0 +1,66 @@
+msgid ""
+msgstr "Content-Type: text/plain; charset=UTF-8\nLanguage: ru\nPlural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
+
+# Navigation
+msgid "Bosh sahifa"
+msgstr "Главная"
+
+msgid "Biz haqimizda"
+msgstr "О нас"
+
+msgid "Aloqa"
+msgstr "Контакты"
+
+msgid "Admin sahifasi"
+msgstr "Админ страница"
+
+msgid "Profil"
+msgstr "Профиль"
+
+msgid "Chiqish"
+msgstr "Выход"
+
+msgid "Mahalliy"
+msgstr "Местные"
+
+msgid "Xorij"
+msgstr "Зарубежные"
+
+msgid "Texnologiya"
+msgstr "Технологии"
+
+msgid "Sport"
+msgstr "Спорт"
+
+# Headlines and labels
+msgid "So'ngi yangiliklar"
+msgstr "Последние новости"
+
+msgid "Kategoriyani tanlang"
+msgstr "Выберите категорию"
+
+msgid "Men bilan aloqa"
+msgstr "Связаться со мной"
+
+msgid "Developed By Boburjon Akramjonovich"
+msgstr "Разработчик: Бобуржон Акрамджонович"
+
+msgid "Qidiruv..."
+msgstr "Поиск..."
+
+msgid "Qidiruv"
+msgstr "Поиск"
+
+# Page titles
+msgid "Mahalliy xabarlar"
+msgstr "Местные новости"
+
+msgid "Sport xabarlari"
+msgstr "Спортивные новости"
+
+msgid "Xorij xabarlari"
+msgstr "Зарубежные новости"
+
+msgid "Texnologiya xabarlari"
+msgstr "Новости технологий"
+

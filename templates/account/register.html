@@ -1,16 +1,39 @@
 {% extends "news/base.html" %}
 {% load static %}
+{% load i18n %}
 
-{% block title %} Foydalanuvchilarni ro'yhatdan o'tkazish {% endblock title %}
+{% block title %} {% trans "Ro'yxatdan o'tish" %} {% endblock title %}
 
 {% block content %}
-
-<h1>Yangi foydalanuvchilarni ro'yhatdan o'tkazish</h1>
-    <p>Ro'yhatdan o'tish uchun quyidagi formani to'ldiring:</p>
-    <form method='post'>{% csrf_token %}
-        {{ user_form.as_p }}
-        <button type="submit">Ro'yhatdan o'tish</button>
+<section class="container auth-container">
+  <div class="section-header">
+    <h2 class="section-title">{% trans "Ro'yxatdan o'tish" %}</h2>
+  </div>
+  <div class="card auth-card">
+    <p class="text-muted" style="margin-bottom: 12px;">{% trans "Iltimos, quyidagi formani to'ldiring." %}</p>
+    <form method='post' novalidate>
+      {% csrf_token %}
+      {% if user_form.non_field_errors %}
+        <div class="alert alert-danger" role="alert">{{ user_form.non_field_errors|striptags }}</div>
+      {% endif %}
+      {% for field in user_form %}
+        <div class="form-group">
+          <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+          {{ field }}
+          {% if field.help_text %}
+            <div class="text-muted small">{{ field.help_text|safe }}</div>
+          {% endif %}
+          {% if field.errors %}
+            <div class="text-danger small">{{ field.errors|striptags }}</div>
+          {% endif %}
+        </div>
+      {% endfor %}
+      <button type="submit" class="btn btn-primary" style="width:100%;">{% trans "Ro'yxatdan o'tish" %}</button>
     </form>
-
-
+    <div class="auth-links">
+      <span class="text-muted">{% trans "Akkountingiz bormi?" %}</span>
+      <a href="{% url 'login' %}">{% trans "Kirish" %}</a>
+    </div>
+  </div>
+</section>
 {% endblock content %}

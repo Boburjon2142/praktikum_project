@@ -1,10 +1,36 @@
 {% extends 'news/base.html' %}
+{% load static %}
+{% load i18n %}
+{% load hitcount_tags %}
+
 {% block title %}Qidiruv natijalari{% endblock title %}
 {% block content %}
-<h2>Qidiruv natijalari</h2>
-    {% for yangilik in barcha_yangiliklar %}
-            <h3><a href="{% url 'news_detail_page' yangilik.slug %}" class="text-danger"> {{ yangilik.title }} </a></h3>
-            <p><img src="{{ yangilik.image.url }}" alt="{{ yangilik.title }}" style="max-width:200px; height:auto;"/></p>
-            <p>{{ yangilik.body | truncatewords:30 }}</p>
-    {% endfor %}
+<section class="container">
+  <div class="section-header">
+    <h2 class="section-title">Qidiruv natijalari</h2>
+    {% if query %}
+      <p class="text-muted">So'rov: "{{ query }}"</p>
+    {% endif %}
+  </div>
+  {% for yangilik in barcha_yangiliklar %}
+    <a class="category-item" href="{% url 'news_detail_page' yangilik.slug %}">
+      <div class="media">
+        <div class="media-left">
+          {% if yangilik.image %}
+            <img src="{{ yangilik.image.url }}" alt="{{ yangilik.title }}" />
+          {% else %}
+            <img src="{% static 'images/featured_img1.jpg' %}" alt="{{ yangilik.title }}" />
+          {% endif %}
+        </div>
+        <div class="media-body">
+          <h3 class="catg_title">{{ yangilik.title }}</h3>
+          <p class="text-muted">{% trans "Ko`rilganlar soni" %}: {% get_hit_count for yangilik %} | {% trans "Izohlar" %}: {{ yangilik.comments.count }}</p>
+          <p class="excerpt">{{ yangilik.body|striptags|truncatewords:24 }}</p>
+        </div>
+      </div>
+    </a>
+  {% empty %}
+    <p class="text-muted">Hech narsa topilmadi.</p>
+  {% endfor %}
+</section>
 {% endblock content %}

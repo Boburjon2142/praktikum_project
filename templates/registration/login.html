@@ -1,20 +1,36 @@
 {% extends 'news/base.html' %}
 {% load static %}
-{% block title %} Login sahifasi {% endblock title %}
+{% load i18n %}
+
+{% block title %} {% trans "Kirish" %} {% endblock title %}
 
 {% block content %}
-
-<div style="margin:200px 30px 10px 30px;">
-
-    <h2 style="text-align: center; margin-bottom: 20px;">Login sahifasi</h2>
-
-    <form method="post" style="max-width: 400px; margin: 0 auto;">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit" style="background-color: #4CAF50; color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer;">Login</button>
-        
+<section class="container auth-container">
+  <div class="section-header">
+    <h2 class="section-title">{% trans "Kirish" %}</h2>
+  </div>
+  <div class="card auth-card">
+    <form method="post" novalidate>
+      {% csrf_token %}
+      {% if form.non_field_errors %}
+        <div class="alert alert-danger" role="alert">{{ form.non_field_errors|striptags }}</div>
+      {% endif %}
+      {% for field in form %}
+        <div class="form-group">
+          <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+          {{ field }}
+          {% if field.errors %}
+            <div class="text-danger small">{{ field.errors|striptags }}</div>
+          {% endif %}
+        </div>
+      {% endfor %}
+      <button type="submit" class="btn btn-primary" style="width:100%;">{% trans "Kirish" %}</button>
     </form>
-    <p>Parolni unutdingizmi? <a href="{% url 'password_reset' %}" style="color:red">Parolni tiklash</a></p>
-    <p>Agar sizda akkaunt bo'lmasa, <a href="{% url 'user_register' %}" style="color:blue">Ro'yxatdan o'tish</a></p>
-</div>
+    <div class="auth-links">
+      <a href="{% url 'password_reset' %}">{% trans "Parolni unutdingizmi?" %}</a>
+      <span> · </span>
+      <a href="{% url 'user_register' %}">{% trans "Ro'yxatdan o'tish" %}</a>
+    </div>
+  </div>
+</section>
 {% endblock content %}

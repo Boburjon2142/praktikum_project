@@ -72,3 +72,7 @@ class Comment(models.Model):
     
 class ViewCount(models.Model):
     ip_adress = models.GenericIPAddressField()
+ 
+
+
+ 

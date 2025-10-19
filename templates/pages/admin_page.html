@@ -1,24 +1,118 @@
 {% extends 'news/base.html' %}
+{% load static %}
+{% load hitcount_tags %}
+
 {% block title %}Admin Sahifasi{% endblock title %}
 
 {% block content %}
-<h1>Admin Sahifasi</h1>
-<h3>Adminlar ro'yxati</h3>
-<table class="table table-bordered table-striped table-responsive">
-    <tr>
-        <th>Foydalanuvchi nomi</th>
-        <th>Ismi</th>
-        <th>Familiyasi</th>
-    </tr>
-    {% for user in admin_users %}
-    <tr>
-        <td>{{ user.username }}</td>
-        <td>{{ user.first_name }}</td>
-        <td>{{ user.last_name }}</td>
-    </tr>
-    {% endfor %}
-</table>
-<h3><a href="{% url 'news_create' %}" class="text-primary">
-    +Yangilik qo'shish
-</a></h3>
+<section class="container">
+  <div class="section-header">
+    <h2 class="section-title">Admin panel</h2>
+  </div>
+
+  <div class="row admin-stats">
+    <div class="col-sm-6 col-md-3">
+      <div class="card stat-card">
+        <div class="stat-value">{{ total_news }}</div>
+        <div class="stat-label">Jami yangiliklar</div>
+      </div>
+    </div>
+    <div class="col-sm-6 col-md-3">
+      <div class="card stat-card">
+        <div class="stat-value text-success">{{ published_news }}</div>
+        <div class="stat-label">E'lon qilingan</div>
+      </div>
+    </div>
+    <div class="col-sm-6 col-md-3">
+      <div class="card stat-card">
+        <div class="stat-value text-muted">{{ draft_news }}</div>
+        <div class="stat-label">Qoralamalar</div>
+      </div>
+    </div>
+    <div class="col-sm-6 col-md-3">
+      <div class="card stat-card">
+        <div class="stat-value">{{ admin_users|length }}</div>
+        <div class="stat-label">Adminlar</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" style="margin-bottom:16px; display:flex; gap:8px; align-items:center; justify-content:space-between;">
+    <div>
+      <strong>Kategoriyalar:</strong>
+      {% for c in category_info %}
+        <span class="badge" style="background:#111; color:#fff; margin-left:6px;">{{ c.name }}: {{ c.published }}/{{ c.total }}</span>
+      {% endfor %}
+    </div>
+    <div>
+      <a href="{% url 'news_create' %}" class="btn btn-primary">+ Yangilik qo'shish</a>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3 style="margin-top:0;">So'ngi 10 ta yangilik</h3>
+    <div class="table-responsive">
+      <table class="table table-striped">
+        <thead>
+          <tr>
+            <th>Sarlavha</th>
+            <th>Kategoriya</th>
+            <th>Holati</th>
+            <th>Sana</th>
+            <th>Ko'rishlar</th>
+            <th>Izohlar</th>
+            <th>Amallar</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for n in latest_news %}
+          <tr>
+            <td><a href="{% url 'news_detail_page' n.slug %}">{{ n.title }}</a></td>
+            <td>{{ n.category.name }}</td>
+            <td>
+              {% if n.status == 'PB' %}
+                <span class="label label-success">Published</span>
+              {% else %}
+                <span class="label label-default">Draft</span>
+              {% endif %}
+            </td>
+            <td>{{ n.publish_time|date:'Y-m-d H:i' }}</td>
+            <td>{% get_hit_count for n %}</td>
+            <td>{{ n.comments.count }}</td>
+            <td>
+              <a class="btn btn-xs btn-default" href="{% url 'news_detail_page' n.slug %}">Ko'rish</a>
+              <a class="btn btn-xs btn-info" href="{% url 'news_update' n.slug %}">Tahrirlash</a>
+              <a class="btn btn-xs btn-danger" href="{% url 'news_delete' n.slug %}">O'chirish</a>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="card" style="margin-top:16px;">
+    <h3>Adminlar ro'yxati</h3>
+    <div class="table-responsive">
+      <table class="table table-bordered table-striped">
+        <thead>
+          <tr>
+            <th>Login</th>
+            <th>Ismi</th>
+            <th>Familiyasi</th>
+          </tr>
+        </thead>
+        <tbody>
+        {% for user in admin_users %}
+          <tr>
+            <td>{{ user.username }}</td>
+            <td>{{ user.first_name }}</td>
+            <td>{{ user.last_name }}</td>
+          </tr>
+        {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
 {% endblock content%}

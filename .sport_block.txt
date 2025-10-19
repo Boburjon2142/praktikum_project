@@ -1,0 +1,86 @@
+ 233:               </div>
+ 234:             </li>
+ 235:           </ul>
+ 236:         </div> {% endcomment %}
+ 237:         <div class="single_post_content">
+ 238:           <h2><span style="color:white">{% blocktrans %}Sport{% endblocktrans %}</span></h2>
+ 239:           <div class="single_post_content_left">
+ 240:             <ul class="business_catgnav">
+ 241:               {% for sport in sport_xabarlari %}
+ 242:                 {% if forloop.first %}
+ 243:                 <li>
+ 244:                   <figure class="bsbig_fig wow fadeInDown">
+ 245:                     <a href="{{ sport.get_absolute_url }}" class="featured_img">
+ 246:                       {% if sport.image %}
+ 247:                         <img alt="" src="{{ sport.image.url }}">
+ 248:                       {% else %}
+ 249:                         <img alt="" src="{% static 'images/featured_img1.jpg' %}">
+ 250:                       {% endif %}
+ 251:                       <span class="overlay"></span>
+ 252:                     </a>
+ 253:                     <figcaption> <a href="{{ sport.get_absolute_url }}">{{ sport.title }}</a> </figcaption>
+ 254:                     <p>{% blocktrans %}Ko`rilganlar soni:{% endblocktrans %} {% get_hit_count for sport %}</p>
+ 255:                     <p>{{ sport.body | truncatewords:10 }}</p>
+ 256:                   </figure>
+ 257:                 </li>
+ 258:                 {% endif %}
+ 259:               {% endfor %}
+ 260:             </ul>
+ 261:           </div>
+ 262:           <div class="single_post_content_right">
+ 263:             <ul class="spost_nav">
+ 264:               {% for sport in sport_xabarlari %}
+ 265:                 {% if forloop.counter > 1 %}
+ 266:                 <li>
+ 267:                   <div class="media wow fadeInDown">
+ 268:                     <a href="{{ sport.get_absolute_url }}" class="media-left">
+ 269:                       {% if sport.image %}
+ 270:                         <img alt="" src="{{ sport.image.url }}">
+ 271:                       {% else %}
+ 272:                         <img alt="" src="{% static 'images/featured_img1.jpg' %}">
+ 273:                       {% endif %}
+ 274:                     </a>
+ 275:                     <div class="media-body">
+ 276:                       <a href="{{ sport.get_absolute_url }}" class="catg_title">{{ sport.title }}</a>
+ 277:                       <p>{% blocktrans %}Ko`rilganlar soni:{% endblocktrans %} {% get_hit_count for sport %}</p>
+ 278:                     </div>
+ 279:                   </div>
+ 280:                 </li>
+ 281:                 {% endif %}
+ 282:               {% endfor %}
+ 283:             </ul>
+ 284:           </div>
+ 285:         </div>
+ 286: 
+ 287: 
+ 288: 
+ 289:       </div>
+ 290:     </div>
+ 291: 
+ 292:     <div class="col-lg-4 col-md-4 col-sm-4">
+ 293:       <aside class="right_content">
+ 294:         <div class="single_sidebar">
+ 295:           <h2><span>{% blocktrans %}Sport{% endblocktrans %}</span></h2>
+ 296:           <ul class="spost_nav">
+ 297:             {% for sport in sport_xabarlari %}
+ 298:             <li>
+ 299:               <div class="media wow fadeInDown">
+ 300:                 <a href="{{ sport.get_absolute_url }}" class="media-left">
+ 301:                   {% if sport.image %}
+ 302:                     <img alt="" src="{{ sport.image.url }}">
+ 303:                   {% else %}
+ 304:                     <img alt="" src="{% static 'images/featured_img1.jpg' %}">
+ 305:                   {% endif %}
+ 306:                 </a>
+ 307:                 <div class="media-body">
+ 308:                   <a href="{{ sport.get_absolute_url }}" class="catg_title">{{ sport.title }}</a>
+ 309:                   <p>{% blocktrans %}Ko`rilganlar soni:{% endblocktrans %} {% get_hit_count for sport %}</p>
+ 310:                 </div>
+ 311:               </div>
+ 312:             </li>
+ 313:             {% endfor %}
+ 314:           </ul>
+ 315:         </div>
+ 316:       </aside>
+ 317:     </div>
+ 318:   </div>

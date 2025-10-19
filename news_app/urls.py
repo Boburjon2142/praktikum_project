@@ -32,7 +32,7 @@ urlpatterns = [
     path('local/', LocalNewsView.as_view(), name="local_news_page"),
     path('foreign/', ForeignNewsView.as_view(), name='foreign_news_page'),
     path('technology/', TechnologyNewsView.as_view(), name='technology_news_page'),
-    path('Sport/', SportNewsView.as_view(), name='sport_news_page'),
+    path('sport/', SportNewsView.as_view(), name='sport_news_page'),
     path('adminpage/', admin_page_view, name='admin_page'),
     path('search/', SearchResultList.as_view(), name='search_results'),
 ]
